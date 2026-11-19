@@ -16,6 +16,13 @@ Weak spots, questions to revisit, and topics to re-quiz.
 - Two's complement: all-zero bits, `INT_MAX` = `0x7FFFFFFF`, `sizeof(int)` on x86-64 Linux
 - What `volatile` does and does not guarantee
 - System V integer argument registers (rdi, rsi, rdx, rcx, r8, r9) and the return register (rax)
+- Why gcc prints 1 for `x + 1 > x` even at -O0 and UBSan misses it, while clang prints 0 and UBSan flags it (UB = compilers may legitimately disagree; sanitizers only see code that survives folding)
+
+**Part A review (2026-11-19), follow-ups:**
+- `stack.c` never calls `make_counter`, so the dangling pointer was never used. Redo b with a `main` that calls it and dereferences the result; compare gcc (returns NULL) vs clang (returns a real stack address), and run clang with ASan to see `stack-use-after-return`.
+- Notes are missing the `readelf -S` / `objdump -s -j .rodata` findings, and sanitizer runs for b and c.
+- Try clang on a: at -O2 the write to the string literal is deleted and the program exits 0. That's the -O0 vs -O2 difference the exercise was after.
+- Minor: `int main()` should be `int main(void)` in C17; the stack warning is a warning, not an error.
 
 **Environment:** Windows 11 PC with no WSL installed yet (checked 2026-11-19). Toolchain setup is part of 1.1 session 1.
 
@@ -78,3 +85,4 @@ Weak spots, questions to revisit, and topics to re-quiz.
 |---|---|---|---|
 | 2026-11-18 | Planning | Built the curriculum and tracker; diagnostic quiz on C memory layout, UB, `volatile` | Toolchain setup; Module 0 decision; start 1.1 |
 | 2026-11-19 | 1.1 | Created this repo. Session 1 "Where things live": process memory map, the four diagnostic rules, System V argument registers. Set practicum: UB exploration + arena allocator. Decided to skip Module 0 | Install WSL2 + toolchain; do Part A and Part B; bring them to session 2 |
+| 2026-11-19 | 1.1 | Moved to Debian on WSL with a push-to-Windows workflow. Reviewed Part A: a and c done, b never exercised the bug, readelf step not written up | Finish Part A follow-ups (see running notes); start Part B arena |
