@@ -6,8 +6,6 @@
 
 Next session: review Part A notes and the arena allocator in `unit1/1.1-c/`, re-quiz, then 1.1 session 2 (dynamic array and hash map).
 
-Open decision: Module 0 (finish Nand2Tetris) or skip it. Session 1 starts Unit 1 directly; tick Module 0 as skipped if that stands.
-
 ## Running notes for the tutor
 
 Weak spots, questions to revisit, and topics to re-quiz.
@@ -24,7 +22,7 @@ Weak spots, questions to revisit, and topics to re-quiz.
 ## Modules
 
 ### Module 0
-- [ ] Module 0 (optional): Nand2Tetris projects 10 to 12
+- [x] ~~Module 0 (optional): Nand2Tetris projects 10 to 12~~ Skipped (decided 2026-11-19)
 
 ### Unit 1: Systems programming
 - [ ] 1.1 Sharpen C: arena allocator, dynamic array, hash map
@@ -79,4 +77,4 @@ Weak spots, questions to revisit, and topics to re-quiz.
 | Date | Module | Covered | Next step |
 |---|---|---|---|
 | 2026-11-18 | Planning | Built the curriculum and tracker; diagnostic quiz on C memory layout, UB, `volatile` | Toolchain setup; Module 0 decision; start 1.1 |
-| 2026-11-19 | 1.1 | Created this repo. Session 1 "Where things live": process memory map, the four diagnostic rules, System V argument registers. Set practicum: UB exploration + arena allocator | Install WSL2 + toolchain; do Part A and Part B; bring them to session 2 |
+| 2026-11-19 | 1.1 | Created this repo. Session 1 "Where things live": process memory map, the four diagnostic rules, System V argument registers. Set practicum: UB exploration + arena allocator. Decided to skip Module 0 | Install WSL2 + toolchain; do Part A and Part B; bring them to session 2 |
