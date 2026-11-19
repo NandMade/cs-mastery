@@ -2,9 +2,9 @@
 
 ## Current position
 
-**Module 1.1 Sharpen C, session 1 in progress** (started 2026-11-19).
+**Module 1.1 Sharpen C, session 1 in progress** (started 2026-11-19). Part A done; Part B (arena allocator) next.
 
-Next session: review Part A notes and the arena allocator in `unit1/1.1-c/`, re-quiz, then 1.1 session 2 (dynamic array and hash map).
+Next session: review the arena allocator in `unit1/1.1-c/arena/` against its done-when list, re-quiz, then 1.1 session 2 (dynamic array and hash map).
 
 ## Running notes for the tutor
 
@@ -18,12 +18,12 @@ Weak spots, questions to revisit, and topics to re-quiz.
 - System V integer argument registers (rdi, rsi, rdx, rcx, r8, r9) and the return register (rax)
 - Why gcc prints 1 for `x + 1 > x` even at -O0 and UBSan misses it, while clang prints 0 and UBSan flags it (UB = compilers may legitimately disagree; sanitizers only see code that survives folding)
 
-**Part A review (2026-11-19), follow-ups:**
-- `stack.c` never calls `make_counter`, so the dangling pointer was never used. Redo b with a `main` that calls it and dereferences the result; compare gcc (returns NULL) vs clang (returns a real stack address), and run clang with ASan to see `stack-use-after-return`.
-- Try clang on a: at -O2 the write to the string literal is deleted and the program exits 0. That's the -O0 vs -O2 difference the exercise was after.
-- Minor: `int main()` should be `int main(void)` in C17; the stack warning is a warning, not an error.
+- Warning vs error: the learner called `-Wreturn-local-addr` a "compiler error" (it's a warning; the binary is still built). Check it has stuck.
+- Dangling pointers: gcc replaces `return &local` with NULL (crash); clang returns the real address, and at -O0 `*p` happened to print the correct 0, the most dangerous outcome. Only clang's ASan names the bug (`stack-use-after-return`).
 
-**Environment:** Windows 11 PC with no WSL installed yet (checked 2026-11-19). Toolchain setup is part of 1.1 session 1.
+**Part A (done 2026-11-19), optional extras not yet tried:** clang on a (-O2 deletes the write and exits 0) and on b. Minor style to watch in Part B: `int main()` should be `int main(void)` in C17.
+
+**Environment:** Debian on WSL2, gcc 14.2 and clang 19.1. Learner codes in `~/learning` there and pushes to the Windows copy (see CLAUDE.md). `pull.rebase=true` set in the Debian repo.
 
 ## Modules
 
@@ -31,7 +31,7 @@ Weak spots, questions to revisit, and topics to re-quiz.
 - [x] ~~Module 0 (optional): Nand2Tetris projects 10 to 12~~ Skipped (decided 2026-11-19)
 
 ### Unit 1: Systems programming
-- [ ] 1.1 Sharpen C: arena allocator, dynamic array, hash map
+- [ ] 1.1 Sharpen C: arena allocator, dynamic array, hash map (Part A UB exploration done)
 - [ ] 1.2 Bits, integers, floating point (Data Lab)
 - [ ] 1.3 x86-64 assembly I (Bomb Lab)
 - [ ] 1.4 x86-64 assembly II (freestanding NASM)
@@ -85,3 +85,4 @@ Weak spots, questions to revisit, and topics to re-quiz.
 | 2026-11-18 | Planning | Built the curriculum and tracker; diagnostic quiz on C memory layout, UB, `volatile` | Toolchain setup; Module 0 decision; start 1.1 |
 | 2026-11-19 | 1.1 | Created this repo. Session 1 "Where things live": process memory map, the four diagnostic rules, System V argument registers. Set practicum: UB exploration + arena allocator. Decided to skip Module 0 | Install WSL2 + toolchain; do Part A and Part B; bring them to session 2 |
 | 2026-11-19 | 1.1 | Moved to Debian on WSL with a push-to-Windows workflow. Reviewed Part A: a and c done, b never exercised the bug (notes only cover surprises, as the lesson asked) | Finish Part A follow-ups (see running notes); start Part B arena |
+| 2026-11-19 | 1.1 | Re-reviewed Part A: `stack.c` now calls `make_counter` and dereferences it; gcc crashes on the NULL it substitutes, UBSan and ASan report it. Part A done | Part B arena allocator; bring it to session 2 |
