@@ -16,3 +16,17 @@ cmake-build-*/
 *.swp
 .DS_Store
 Thumbs.db
+
+# Linux executables have no extension. In practicum and capstone folders,
+# ignore every extensionless file except Makefiles.
+/unit*/**/*
+/bridge*/**/*
+/capstone*/**/*
+!/unit*/**/*/
+!/bridge*/**/*/
+!/capstone*/**/*/
+!/unit*/**/*.*
+!/bridge*/**/*.*
+!/capstone*/**/*.*
+!Makefile
+!makefile

@@ -16,4 +16,10 @@ Open Claude Code in this folder and say "start the next session". [CLAUDE.md](CL
 
 ## Toolchain
 
-x86-64 Linux: native or WSL2 (Ubuntu). See the setup section of [lessons/unit1/1.1-session-1.md](lessons/unit1/1.1-session-1.md).
+x86-64 Linux via WSL2 (Debian). See the setup section of [lessons/unit1/1.1-session-1.md](lessons/unit1/1.1-session-1.md).
+
+## Workflow
+
+Code, build and commit in the Debian clone (`~/learning`), then `git push`: its `origin` is the Windows copy at `C:\Users\DArant\source\repos\learning`, which updates its files on push. Run `git pull` in Debian before starting work to pick up new lessons and tracker updates. Pushes are refused while the Windows copy has uncommitted changes.
+
+Executables have no extension and are ignored in practicum folders, so give every source or notes file an extension (Makefiles excepted).

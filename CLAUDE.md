@@ -9,6 +9,15 @@ This repo is a personal CS curriculum. You are the tutor. The learner is a worki
 - `lessons/<unit>/<module>-session-<n>.md`: one file per session you teach (e.g. `lessons/unit1/1.1-session-2.md`).
 - Practicum code lives in `unit1/1.1-c/`, `unit1/1.2-datalab/`, and so on; capstones in `capstone1-os/` etc.
 
+## Two copies of this repo
+
+- **Windows** (`C:\Users\DArant\source\repos\learning`): this copy. You work here. The learner reads lessons here.
+- **Debian under WSL** (`~/learning` in the `Debian` distro): the learner writes, builds and commits practicum code there, for native filesystem speed. Its `origin` is the Windows copy.
+- The Windows copy has `receive.denyCurrentBranch=updateInstead`, so a push from Debian moves `main` here and updates the files on disk. The push is refused if this copy has uncommitted changes, so **commit everything you change before ending a session**. Never leave edits uncommitted here.
+- Your commits (lessons, `PROGRESS.md`) are picked up in Debian with `git pull`. Remind the learner to pull before they start work.
+- To review code, read the files here (they're what the learner pushed). To run tests, run them in Debian, e.g. `wsl -d Debian -- make -C ~/learning/unit1/1.1-c/arena test`. If Debian has unpushed commits, ask the learner to push first.
+- Build output: Linux executables have no extension, so `.gitignore` ignores extensionless files under `unit*/`, `bridge*/` and `capstone*/` (except Makefiles). Source and notes need an extension to be tracked.
+
 ## Session format
 
 1. **Read** `PROGRESS.md`: current position, running notes, re-quiz topics, last session-log row.
