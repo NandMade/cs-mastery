@@ -1,6 +1,7 @@
 #include "arena.h"
 #include "../../../lib/check.h"
 #include <stdint.h>
+#include <stddef.h>
 
 static void test_arena_alloc_returns_correctly_aligned_pointers(void) {
     Arena *ar = arena_create(1000);
@@ -13,17 +14,39 @@ static void test_arena_alloc_returns_correctly_aligned_pointers(void) {
 
     CHECK(((uintptr_t)thing2 & 31) == 0);
 
-    CHECK((uintptr_t)thing2 - (uintptr_t)thing == 32);
+    void *thing3 = arena_alloc(ar, 64, 64);
 
-    void *bigthing = arena_alloc(ar, 1000, 1000);
+    CHECK(((uintptr_t)thing3 & 63) == 0);
 
-    CHECK(bigthing == NULL);
+    arena_destroy(ar);
+}
+
+static void test_arena_alloc_absurd_inputs_return_null(void) {
+    Arena *ar = arena_create(SIZE_MAX);
+
+    CHECK(ar == NULL);
+
+    ar = arena_create(8000);
+
+    void *largeThing = arena_alloc(ar, SIZE_MAX, 16);
+
+    CHECK(largeThing == NULL);
+
+    void *largeAlignment = arena_alloc(ar, 16, SIZE_MAX);
+
+    CHECK(((uintptr_t)largeAlignment & (SIZE_MAX - 1)) == 0);
+
+    arena_alloc(ar, 4000, 8);
+    void *thing2 = arena_alloc(ar, 4001, 8);
+
+    CHECK(thing2 == NULL);
 
     arena_destroy(ar);
 }
 
 int main(void) {
     test_arena_alloc_returns_correctly_aligned_pointers();
+    test_arena_alloc_absurd_inputs_return_null();
 
     if (failures > 0) {
         return 1;

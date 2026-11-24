@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include "../../../lib/custom_math.h"
 
 typedef struct Arena {
     size_t capacity;
@@ -12,6 +13,8 @@ typedef struct Arena {
 } Arena;
 
 Arena *arena_create(size_t capacity) {
+    if (capacity > PTRDIFF_MAX) return NULL;
+
     Arena *new = malloc(sizeof(Arena));
 
     new->offset = 0;
@@ -22,15 +25,21 @@ Arena *arena_create(size_t capacity) {
 }
 
 bool arena_has_capacity(Arena *a, size_t size, size_t padding) {
-    return a->offset + padding + size <= a->capacity;
-}
+    size_t availableSpace = a->capacity - a->offset;
 
-size_t arena_get_offset(Arena *a) {
-    return a->offset;
+    if (size > availableSpace) return false;
+    if (padding > availableSpace) return false;
+    if (availableSpace - size < padding) return false;
+    if (availableSpace - padding < size) return false;
+
+    return true;
 }
 
 void *arena_alloc(Arena *a, size_t size, size_t align) {
-    size_t requiredPadding = a->offset == 0 ? 0 : align - a->offset % align;
+    size_t requiredPadding = a->offset == 0 ? 0
+        : a->offset < align ? align - a->offset
+        : align - a->offset % align;
+    
     uintptr_t next;
 
     if (arena_has_capacity(a, size, requiredPadding)) 

@@ -6,7 +6,6 @@ typedef struct Arena Arena;
 
 Arena *arena_create(size_t capacity);
 void *arena_alloc(Arena *a, size_t size, size_t align);
-size_t arena_get_offset(Arena *a);
 void arena_reset(Arena *a);
 void arena_destroy(Arena *a);
 
