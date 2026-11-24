@@ -15,19 +15,28 @@ cmake-build-*/
 .vscode/
 .idea/
 *.swp
+*.swo
 .DS_Store
 Thumbs.db
 
-# Linux executables have no extension. In practicum and capstone folders,
+# Linux executables have no extension. In practicum, capstone and lib folders,
 # ignore every extensionless file except Makefiles.
 /unit*/**/*
 /bridge*/**/*
 /capstone*/**/*
+/lib/**/*
 !/unit*/**/*/
 !/bridge*/**/*/
 !/capstone*/**/*/
+!/lib/**/*/
 !/unit*/**/*.*
 !/bridge*/**/*.*
 !/capstone*/**/*.*
+!/lib/**/*.*
+# The !*.* lines above re-include every dotted file; re-ignore build output and swap files.
+*.o
+*.d
+*.swp
+*.swo
 !Makefile
 !makefile
