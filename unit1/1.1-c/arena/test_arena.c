@@ -72,12 +72,23 @@ static void test_arena_alloc_item_fits_exactly_returns_pointer(void) {
     arena_destroy(ar);
 }
 
+static void test_arena_alloc_oddAlignment_returnsNullPointer(void) {
+    Arena *ar = arena_create(16);
+
+    void *thing1 = arena_alloc(ar, 16, 3);
+
+    CHECK(thing1 == NULL);
+
+    arena_destroy(ar);
+}
+
 int main(void) {
     test_arena_alloc_returns_correctly_aligned_pointers();
     test_arena_alloc_absurd_inputs_return_null();
     test_arena_alloc_exhausted_returns_null();
     test_arena_reset_allows_further_allocation();
     test_arena_alloc_item_fits_exactly_returns_pointer();
+    test_arena_alloc_oddAlignment_returnsNullPointer();
 
     if (failures > 0) {
         return 1;
