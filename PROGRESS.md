@@ -2,9 +2,9 @@
 
 ## Current position
 
-**Module 1.1 Sharpen C, session 1 in progress** (started 2026-11-19). Part A done; Part B (arena allocator) next.
+**Module 1.1 Sharpen C, session 1 practicum done** (2026-11-24). Part A and Part B (arena allocator) both pass their done-when lists; the Part B stretch (chained blocks) was not attempted.
 
-Next session: review the arena allocator in `unit1/1.1-c/arena/` against its done-when list, re-quiz, then 1.1 session 2 (dynamic array and hash map).
+Next session: re-quiz, then 1.1 session 2 (dynamic array and hash map).
 
 ## Running notes for the tutor
 
@@ -20,9 +20,14 @@ Weak spots, questions to revisit, and topics to re-quiz.
 - Alignment is a property of the type being allocated (`alignof(T)`), not of the previous allocation. The learner first thought padding was always `8 - allocated % 8` (also off by one when already aligned). Ask them to work a padding example by hand.
 - Why UBSan needs `-fno-sanitize-recover=all` in a test build
 - Warning vs error: the learner called `-Wreturn-local-addr` a "compiler error" (it's a warning; the binary is still built). Check it has stuck.
+- Off-by-one in alignment padding came back in the arena (`align - addr % align` pads a full `align` when already aligned), and the fix recomputes the address instead of reusing it. Ask them to derive branch-free padding: `(align - addr % align) % align`, or `-addr & (align - 1)` for a power of two.
+- Tests that pass on NULL: the first arena tests only masked the pointer (`(uintptr_t)p & 7`), so NULL passed. One (`arena_alloc(ar, 16, SIZE_MAX)`) still does. Ask what a test must assert before checking a property of a result.
+- Power-of-two check: they wrote a popcount loop. Ask for the one-expression `n && !(n & (n - 1))` and why it works.
 - Dangling pointers: gcc replaces `return &local` with NULL (crash); clang returns the real address, and at -O0 `*p` happened to print the correct 0, the most dangerous outcome. Only clang's ASan names the bug (`stack-use-after-return`).
 
-**Part A (done 2026-11-19), optional extras not yet tried:** clang on a (-O2 deletes the write and exits 0) and on b. Minor style to watch in Part B: `int main()` should be `int main(void)` in C17.
+**Part A (done 2026-11-19), optional extras not yet tried:** clang on a (-O2 deletes the write and exits 0) and on b.
+
+**Part B (done 2026-11-24):** `make test` passes under gcc and clang with the full sanitizer flags. Extra edge cases also pass: exact fill, the allocation after a full arena, `SIZE_MAX` and `SIZE_MAX - 1` on a partly full arena, just-over vs exactly-remaining, reset returning the buffer start, and align 0, 3, 12, `SIZE_MAX` and an align larger than the arena. Style left to fix: `arena_has_capacity` and `is_power_of_two` should be `static`; two of the capacity checks in `arena_has_capacity` are redundant. Stretch (chain blocks) not attempted; offer it again if the dynamic array goes quickly.
 
 **Background gap:** comfortable with C itself but has no experience with real-world C build systems or automated testing. Taught a Makefile + hand-rolled CHECK-macro tests in the 1.1 supplement (2026-11-19); review the arena's Makefile and tests as closely as its code. Introduce pattern rules and `-MMD -MP` when a practicum grows past a few files, and CMake properly in Bridge B.
 
@@ -34,7 +39,7 @@ Weak spots, questions to revisit, and topics to re-quiz.
 - [x] ~~Module 0 (optional): Nand2Tetris projects 10 to 12~~ Skipped (decided 2026-11-19)
 
 ### Unit 1: Systems programming
-- [ ] 1.1 Sharpen C: arena allocator, dynamic array, hash map (Part A UB exploration done)
+- [ ] 1.1 Sharpen C: arena allocator, dynamic array, hash map (Part A UB exploration and Part B arena done)
 - [ ] 1.2 Bits, integers, floating point (Data Lab)
 - [ ] 1.3 x86-64 assembly I (Bomb Lab)
 - [ ] 1.4 x86-64 assembly II (freestanding NASM)
@@ -90,3 +95,4 @@ Weak spots, questions to revisit, and topics to re-quiz.
 | 2026-11-19 | 1.1 | Moved to Debian on WSL with a push-to-Windows workflow. Reviewed Part A: a and c done, b never exercised the bug (notes only cover surprises, as the lesson asked) | Finish Part A follow-ups (see running notes); start Part B arena |
 | 2026-11-19 | 1.1 | Re-reviewed Part A: `stack.c` now calls `make_counter` and dereferences it; gcc crashes on the NULL it substitutes, UBSan and ASan report it. Part A done | Part B arena allocator; bring it to session 2 |
 | 2026-11-19 | 1.1 | Supplement for Part B: what an arena is, alignment as a property of the type (`alignof`), Make basics, hand-rolled C tests, `-fno-sanitize-recover=all` (added to the done-when flags) | Read the supplement, then build the arena with `make test` |
+| 2026-11-24 | 1.1 | Reviewed the Part B arena twice. First pass found off-by-one padding (exact fit returned NULL), no power-of-two check (align 0 divided by zero), unchecked `malloc`, and tests that passed on NULL. All fixed; Part B passes its done-when list under gcc and clang | Re-quiz, then 1.1 session 2: dynamic array and hash map |
