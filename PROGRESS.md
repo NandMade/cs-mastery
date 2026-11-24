@@ -34,6 +34,8 @@ Weak spots, questions to revisit, and topics to re-quiz.
 
 **Background gap:** comfortable with C itself but has no experience with real-world C build systems or automated testing. Taught a Makefile + hand-rolled CHECK-macro tests in the 1.1 supplement (2026-11-19); review the arena's Makefile and tests as closely as its code. Introduce pattern rules and `-MMD -MP` when a practicum grows past a few files, and CMake properly in Bridge B.
 
+**Bit-trick intuition (raised 2026-11-24):** the learner is worried they can't intuit binary tricks (e.g. exponentiation by squaring). Reassured: the tricks are learned folklore built from a few primitives (`x & (x-1)`, `x & -x`, mask = mod by a power of two, `-x = ~x + 1`). In 1.2, have them work 4- or 8-bit examples by hand and derive each trick from those primitives before seeing a solution, and point out when they've derived one themselves.
+
 **Environment:** Debian on WSL2, gcc 14.2 and clang 19.1. Learner codes in `~/learning` there and pushes to the Windows copy (see CLAUDE.md). `pull.rebase=true` set in the Debian repo.
 
 ## Modules
