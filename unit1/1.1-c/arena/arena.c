@@ -36,9 +36,7 @@ bool arena_has_capacity(Arena *a, size_t size, size_t padding) {
 }
 
 void *arena_alloc(Arena *a, size_t size, size_t align) {
-    size_t requiredPadding = a->offset == 0 ? 0
-        : a->offset < align ? align - a->offset
-        : align - a->offset % align;
+    size_t requiredPadding = align - ((uintptr_t)a->storage + a->offset) % align;
     
     uintptr_t next;
 

@@ -36,6 +36,12 @@ static void test_arena_alloc_absurd_inputs_return_null(void) {
 
     CHECK(((uintptr_t)largeAlignment & (SIZE_MAX - 1)) == 0);
 
+    arena_destroy(ar);
+}
+
+static void test_arena_alloc_exhausted_returns_null(void) {
+    Arena *ar = arena_create(8000);
+
     arena_alloc(ar, 4000, 8);
     void *thing2 = arena_alloc(ar, 4001, 8);
 
@@ -44,9 +50,23 @@ static void test_arena_alloc_absurd_inputs_return_null(void) {
     arena_destroy(ar);
 }
 
+static void test_arena_reset_allows_further_allocation(void) {
+    Arena *ar = arena_create(8000);
+
+    arena_alloc(ar, 4000, 8);
+    arena_reset(ar);
+    void *thing2 = arena_alloc(ar, 4001, 8);
+
+    CHECK(thing2 != NULL);
+
+    arena_destroy(ar);
+}
+
 int main(void) {
     test_arena_alloc_returns_correctly_aligned_pointers();
     test_arena_alloc_absurd_inputs_return_null();
+    test_arena_alloc_exhausted_returns_null();
+    test_arena_reset_allows_further_allocation();
 
     if (failures > 0) {
         return 1;
