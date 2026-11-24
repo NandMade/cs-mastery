@@ -5,11 +5,11 @@
 
 static int failures = 0;
 
-#define CHECK(cond) \
+#define CHECK(cond, msg) \
     do { \
         if (!(cond)) { \
-            fprintf(stderr, "%s:%d: CHECK failed: %s\n", \
-                    __FILE__, __LINE__, #cond); \
+            fprintf(stderr, "%s:%d: CHECK failed: %s\n, msg: %s", \
+                    __FILE__, __LINE__, #cond, msg); \
             failures++; \
         } \
     } while (0) \
