@@ -37,7 +37,7 @@ static void test_arena_alloc_absurd_inputs_return_null(void) {
 
     void *largeAlignment = arena_alloc(ar, 16, SIZE_MAX);
 
-    CHECK(((uintptr_t)largeAlignment & (SIZE_MAX - 1)) == 0);
+    CHECK(largeAlignment == NULL);
 
     arena_destroy(ar);
 }

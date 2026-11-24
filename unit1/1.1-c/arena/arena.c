@@ -30,18 +30,16 @@ Arena *arena_create(size_t capacity) {
     return new;
 }
 
-bool arena_has_capacity(Arena *a, size_t size, size_t padding) {
+static bool arena_has_capacity(Arena *a, size_t size, size_t padding) {
     size_t availableSpace = a->capacity - a->offset;
 
     if (size > availableSpace) return false;
-    if (padding > availableSpace) return false;
     if (availableSpace - size < padding) return false;
-    if (availableSpace - padding < size) return false;
 
     return true;
 }
 
-bool is_power_of_two(size_t n) {
+static bool is_power_of_two(size_t n) {
     size_t count = 0;
 
     while (n != 0) {
