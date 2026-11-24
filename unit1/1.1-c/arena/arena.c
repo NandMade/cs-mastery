@@ -17,9 +17,17 @@ Arena *arena_create(size_t capacity) {
 
     Arena *new = malloc(sizeof(Arena));
 
+    if (new == NULL) return NULL;
+
     new->offset = 0;
     new->capacity = capacity;
     new->storage = malloc(capacity);
+
+    if (new->storage == NULL) 
+    {
+        free(new);
+        return NULL;
+    }
 
     return new;
 }
