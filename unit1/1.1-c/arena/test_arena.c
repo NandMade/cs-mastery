@@ -55,9 +55,19 @@ static void test_arena_reset_allows_further_allocation(void) {
 
     arena_alloc(ar, 4000, 8);
     arena_reset(ar);
-    void *thing2 = arena_alloc(ar, 4001, 8);
+    void *thing1 = arena_alloc(ar, 4001, 8);
 
-    CHECK(thing2 != NULL);
+    CHECK(thing1 != NULL);
+
+    arena_destroy(ar);
+}
+
+static void test_arena_alloc_item_fits_exactly_returns_pointer(void) {
+    Arena *ar = arena_create(16);
+
+    void *thing1 = arena_alloc(ar, 16, 16);
+
+    CHECK(thing1 != NULL);
 
     arena_destroy(ar);
 }
@@ -67,6 +77,7 @@ int main(void) {
     test_arena_alloc_absurd_inputs_return_null();
     test_arena_alloc_exhausted_returns_null();
     test_arena_reset_allows_further_allocation();
+    test_arena_alloc_item_fits_exactly_returns_pointer();
 
     if (failures > 0) {
         return 1;
