@@ -1,7 +1,7 @@
-#include <stddef.h>
-
 #ifndef ARENA
 #define ARENA
+#include <stddef.h>
+
 typedef struct Arena Arena;
 
 Arena *arena_create(size_t capacity);

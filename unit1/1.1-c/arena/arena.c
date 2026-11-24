@@ -3,8 +3,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <stdio.h>
-#include "../../../lib/custom_math.h"
 
 typedef struct Arena {
     size_t capacity;
@@ -43,9 +41,20 @@ bool arena_has_capacity(Arena *a, size_t size, size_t padding) {
     return true;
 }
 
+bool is_power_of_two(size_t n) {
+    size_t count = 0;
+
+    while (n != 0) {
+        n &= (n - 1);
+        count++;
+    }
+
+    return count == 1;
+}
+
 void *arena_alloc(Arena *a, size_t size, size_t align) {
     if (align == 0) return NULL;
-    if (align % 2 != 0) return NULL;
+    if (!is_power_of_two(align)) return NULL;
     
     void *effectiveAddress = (void *)((uintptr_t)a->storage + a->offset);
     size_t requiredPadding = (uintptr_t)effectiveAddress % align == 0 ? 0 : align - ((uintptr_t)a->storage + a->offset) % align;
