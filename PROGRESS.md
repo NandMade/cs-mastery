@@ -2,32 +2,35 @@
 
 ## Current position
 
-**Module 1.1 Sharpen C, session 1 practicum done** (2026-11-24). Part A and Part B (arena allocator) both pass their done-when lists; the Part B stretch (chained blocks) was not attempted.
+**Module 1.1 Sharpen C, session 2 in progress** (started 2026-11-24). Session 1 practicum (UB exploration, arena) done. Session 2 practicum: dynamic array and hash map in `unit1/1.1-c/containers/`, about two weeks.
 
-Next session: re-quiz, then 1.1 session 2 (dynamic array and hash map).
+Next session (1.1 session 3): re-quiz, review both containers against the session 2 done-when list. If they pass, tick 1.1 and start 1.2.
 
 ## Running notes for the tutor
 
 Weak spots, questions to revisit, and topics to re-quiz.
 
 **Re-quiz next session:**
-- What lives in `.rodata` vs `.bss` vs `.data`; why `char *s = "hello"` and `char s[] = "hello"` differ
-- Signed overflow is UB, unsigned wraps; why `x + 1 > x` can fold to true
+- Hex notation: on 2026-11-24 the learner thought `0x` meant binary. Explained hex (4 bits per digit, last digit = addr mod 16) and `0b`. Next time, give an address in hex and ask for its value mod 8, 16 and 64 without converting to decimal. Recheck before 1.2, which leans on it hard.
+- Unsigned negation (`-x` is 2ᴺ − x mod 2ᴺ) and integer promotion of narrow types (`-(unsigned char)1` is int -1). Taught 2026-11-24 when the learner asked; promotion returns in 1.2.
+- `realloc` failure handling, stale pointers after a vector grows, tombstones vs empty slots (new in session 2)
+- What lives in `.rodata` vs `.bss` vs `.data`; why `char *s = "hello"` and `char s[] = "hello"` differ (answered well 2026-11-24; lower priority)
+- Signed overflow is UB, unsigned wraps; why `x + 1 > x` can fold to true. 2026-11-24: concept right, but on `UINT_MAX + 1 > UINT_MAX` they reasoned "0 + 1 < UINT_MAX" instead of "0 > UINT_MAX is false". Ask them to trace an unsigned comparison step by step.
 - Two's complement: all-zero bits, `INT_MAX` = `0x7FFFFFFF`, `sizeof(int)` on x86-64 Linux
 - What `volatile` does and does not guarantee
 - System V integer argument registers (rdi, rsi, rdx, rcx, r8, r9) and the return register (rax)
 - Why gcc prints 1 for `x + 1 > x` even at -O0 and UBSan misses it, while clang prints 0 and UBSan flags it (UB = compilers may legitimately disagree; sanitizers only see code that survives folding)
 - Alignment is a property of the type being allocated (`alignof(T)`), not of the previous allocation. The learner first thought padding was always `8 - allocated % 8` (also off by one when already aligned). Ask them to work a padding example by hand.
-- Why UBSan needs `-fno-sanitize-recover=all` in a test build
-- Warning vs error: the learner called `-Wreturn-local-addr` a "compiler error" (it's a warning; the binary is still built). Check it has stuck.
-- Off-by-one in alignment padding came back in the arena (`align - addr % align` pads a full `align` when already aligned), and the fix recomputes the address instead of reusing it. Ask them to derive branch-free padding: `(align - addr % align) % align`, or `-addr & (align - 1)` for a power of two.
+- Why UBSan needs `-fno-sanitize-recover=all` in a test build (answered correctly 2026-11-24; tie it to valgrind's `--error-exitcode` next time)
+- Warning vs error: answered correctly 2026-11-24 (it's a warning; a binary is built). Stuck; drop after one more check.
+- Off-by-one in alignment padding: on 2026-11-24 they worked three hex examples correctly and wrote the branch-free `(align - addr % align) % align` themselves. `-addr & (align - 1)` was explained; ask them to derive it again in 1.2.
 - Tests that pass on NULL: the first arena tests only masked the pointer (`(uintptr_t)p & 7`), so NULL passed. One (`arena_alloc(ar, 16, SIZE_MAX)`) still does. Ask what a test must assert before checking a property of a result.
 - Power-of-two check: they wrote a popcount loop. Ask for the one-expression `n && !(n & (n - 1))` and why it works.
 - Dangling pointers: gcc replaces `return &local` with NULL (crash); clang returns the real address, and at -O0 `*p` happened to print the correct 0, the most dangerous outcome. Only clang's ASan names the bug (`stack-use-after-return`).
 
 **Part A (done 2026-11-19), optional extras not yet tried:** clang on a (-O2 deletes the write and exits 0) and on b.
 
-**Part B (done 2026-11-24):** `make test` passes under gcc and clang with the full sanitizer flags. Extra edge cases also pass: exact fill, the allocation after a full arena, `SIZE_MAX` and `SIZE_MAX - 1` on a partly full arena, just-over vs exactly-remaining, reset returning the buffer start, and align 0, 3, 12, `SIZE_MAX` and an align larger than the arena. Style left to fix: `arena_has_capacity` and `is_power_of_two` should be `static`; two of the capacity checks in `arena_has_capacity` are redundant. Stretch (chain blocks) not attempted; offer it again if the dynamic array goes quickly.
+**Part B (done 2026-11-24):** `make test` passes under gcc and clang with the full sanitizer flags. Extra edge cases also pass: exact fill, the allocation after a full arena, `SIZE_MAX` and `SIZE_MAX - 1` on a partly full arena, just-over vs exactly-remaining, reset returning the buffer start, and align 0, 3, 12, `SIZE_MAX` and an align larger than the arena. Style points (`static` helpers, the two redundant capacity checks, the `SIZE_MAX`-align test asserting `NULL`) fixed in 6c62013. Stretch (chain blocks) not attempted; offer it again if the dynamic array goes quickly.
 
 **Background gap:** comfortable with C itself but has no experience with real-world C build systems or automated testing. Taught a Makefile + hand-rolled CHECK-macro tests in the 1.1 supplement (2026-11-19); review the arena's Makefile and tests as closely as its code. Introduce pattern rules and `-MMD -MP` when a practicum grows past a few files, and CMake properly in Bridge B.
 
@@ -96,3 +99,4 @@ Weak spots, questions to revisit, and topics to re-quiz.
 | 2026-11-19 | 1.1 | Re-reviewed Part A: `stack.c` now calls `make_counter` and dereferences it; gcc crashes on the NULL it substitutes, UBSan and ASan report it. Part A done | Part B arena allocator; bring it to session 2 |
 | 2026-11-19 | 1.1 | Supplement for Part B: what an arena is, alignment as a property of the type (`alignof`), Make basics, hand-rolled C tests, `-fno-sanitize-recover=all` (added to the done-when flags) | Read the supplement, then build the arena with `make test` |
 | 2026-11-24 | 1.1 | Reviewed the Part B arena twice. First pass found off-by-one padding (exact fit returned NULL), no power-of-two check (align 0 divided by zero), unchecked `malloc`, and tests that passed on NULL. All fixed; Part B passes its done-when list under gcc and clang | Re-quiz, then 1.1 session 2: dynamic array and hash map |
+| 2026-11-24 | 1.1 | Session 2 "Growing Things". Quiz: `.rodata` vs stack array right; hex notation was new (thought `0x` was binary); padding by hand right, wrote the branch-free expression; signed-overflow folding right, slipped tracing `UINT_MAX + 1 > UINT_MAX`; sanitizer-recover and warning vs error right. Taught dynamic arrays, `realloc` traps, open addressing, deletion, pattern rules with `-MMD -MP`, valgrind vs ASan, gdb basics. Added `*.d` to `.gitignore` | Build `unit1/1.1-c/containers/` (vec, then map) with `make test` and `make valgrind`; bring it to session 3 |
