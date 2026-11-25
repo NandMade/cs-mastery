@@ -1,29 +1,101 @@
 #include "vec.h"
-#include "stdlib.h"
+#include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
+
+typedef unsigned char byte;
 
 struct Vec {
     size_t capacity;
     size_t len;
     size_t elem_size;
-    char *buff;
+    byte *buff;
 };
 
+static const size_t initial_capacity = 16;
+
 Vec *vec_create(size_t elem_size) {
+    if (SIZE_MAX / initial_capacity < elem_size) return NULL;
+
+    byte *buff = calloc(initial_capacity, elem_size);
+    
+    if (buff == NULL) return NULL;
+    
     Vec *new = malloc(sizeof(Vec));
 
-    if (new == NULL) return NULL;
-
-    new->capacity = 16;
-    new->len = 0;
-    new->elem_size = elem_size;
-    new->buff = calloc(new->capacity, new->elem_size);
-
-    if (new->buff == NULL) 
+    if (new == NULL) 
     {
-        free(new);
+        free(buff);
 
         return NULL;
     }
 
+    new->capacity = 16;
+    new->len = 0;
+    new->elem_size = elem_size;
+    new->buff = buff;
+
     return new;
+}
+
+void vec_destroy(Vec *v) {
+    free(v->buff);
+    free(v);
+}
+
+size_t vec_capacity(const Vec *v) {
+    return v->capacity;
+}
+
+size_t vec_len(const Vec *v) {
+    return v->len;
+}
+
+void *vec_get(Vec *v, size_t i) {
+    if (i >= v->len) return NULL;
+
+    return v->buff + i * v->elem_size;
+}
+
+static bool vec_grow(Vec *v) {
+    if (SIZE_MAX / (long double)v->capacity / (long double)v->elem_size < 1.5) {
+        return false;
+    }
+
+    v->capacity *= 1.5;
+    byte *newbuff = realloc(v->buff, v->capacity * v->elem_size);
+
+    if (newbuff == NULL) 
+    {
+        return false;
+    }
+    
+    v->buff = newbuff;
+
+    return true;
+}
+
+bool vec_push(Vec *v, const void *elem) {
+    if (v->len == v->capacity) {
+        bool grew = vec_grow(v);
+
+        if (!grew) return false;
+    }
+
+    memcpy(v->buff + v->len * v->elem_size, elem, v->elem_size);
+    v->len++;
+
+    return true;
+}
+
+bool vec_pop(Vec *v, void *out) {
+    if (v->len == 0) {
+        return false;
+    }
+
+    memcpy(out, v->buff + (v->len - 1) * v->elem_size, v->elem_size);
+
+    v->len--;
+
+    return true;
 }

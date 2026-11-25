@@ -1,9 +1,6 @@
 #include "int_math.h"
 #include <stdint.h>
 
-// x^9  = x^8 * x
-//      = x^2 * x^2 * x^2 * x
-//      = x^2^3 * x
 bool size_pow(size_t base, size_t exponent, size_t *out) {
     size_t result = 1;
 
@@ -22,19 +19,24 @@ bool size_pow(size_t base, size_t exponent, size_t *out) {
         
         exponent >>= 1;
 
-        if (base > 0 && SIZE_MAX / base < base)
+        if (exponent > 0) 
         {
-            *out = SIZE_MAX;
+            if (base > 0 && SIZE_MAX / base < base)
+            {
+                *out = SIZE_MAX;
 
-            return false;
+                return false;
+            }
+
+            base *= base;
         }
-        base *= base;
     }
 
     *out = result;
 
     return true;
 }
+
 
 
 
