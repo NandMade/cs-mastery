@@ -15,6 +15,7 @@ struct Vec {
 static const size_t initial_capacity = 16;
 
 Vec *vec_create(size_t elem_size) {
+    if (elem_size == 0) return NULL;
     if (SIZE_MAX / initial_capacity < elem_size) return NULL;
 
     byte *buff = calloc(initial_capacity, elem_size);
@@ -30,7 +31,7 @@ Vec *vec_create(size_t elem_size) {
         return NULL;
     }
 
-    new->capacity = 16;
+    new->capacity = initial_capacity;
     new->len = 0;
     new->elem_size = elem_size;
     new->buff = buff;
@@ -58,18 +59,19 @@ void *vec_get(Vec *v, size_t i) {
 }
 
 static bool vec_grow(Vec *v) {
-    if (SIZE_MAX / (long double)v->capacity / (long double)v->elem_size < 1.5) {
+    if (SIZE_MAX / v->capacity / v->elem_size < 1.5) {
         return false;
     }
 
-    v->capacity *= 1.5;
-    byte *newbuff = realloc(v->buff, v->capacity * v->elem_size);
+    size_t new_capacity = v->capacity + v->capacity / 2;
+    byte *newbuff = realloc(v->buff, new_capacity * v->elem_size);
 
     if (newbuff == NULL) 
     {
         return false;
     }
     
+    v->capacity = new_capacity;
     v->buff = newbuff;
 
     return true;

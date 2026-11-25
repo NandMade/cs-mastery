@@ -172,7 +172,7 @@ void test_vec_whenCapacityExhausted_growsGeometrically(void) {
 
     unsigned int capacity_after = vec_capacity(vec);
 
-    CHECK(capacity_after == 16 + 8, "The capacity did not double after being exceeded.\n");
+    CHECK(capacity_after == 16 + 8, "The capacity did not grow by 1.5 after being exceeded.\n");
     CHECK(vec_len(vec) < vec_capacity(vec), "The vector length should never be longer than its capacity.\n");
 
     vec_destroy(vec);
@@ -211,12 +211,20 @@ void test_vec_len_whenNoElementsHaveBeenAdded_ReturnsZero(void) {
     vec_destroy(v);
 }
 
-void test_vec_impossible_elem_size_returnsNull(void) {
+void test_vec_create_impossible_elem_size_returnsNull(void) {
     Vec *v = vec_create(SIZE_MAX / 2);
 
     CHECK(v == NULL, "Should have failed to allocate Vec.\n");
 
-    vec_destroy(v);
+    if (v != NULL) vec_destroy(v);
+}
+
+void test_vec_create_zeroElementSize_returnsNull(void) {
+    Vec *v = vec_create(0);
+
+    CHECK(v == NULL, "Should have failed to allocate Vec.\n");
+
+    if (v != NULL) vec_destroy(v);
 }
 
 int main(void) {
@@ -228,4 +236,9 @@ int main(void) {
     test_vec_create_valid_elem_size_ReturnsPointerValidPointer();
     test_vec_create_invalid_elem_size_ReturnsNull();
     test_vec_len_whenNoElementsHaveBeenAdded_ReturnsZero();
+    test_vec_create_impossible_elem_size_returnsNull();
+
+    if (failures > 0) return 1;
+
+    return 0;
 }
