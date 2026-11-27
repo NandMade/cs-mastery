@@ -14,3 +14,15 @@ uint64_t hash_fnv1a(byte *start, size_t length) {
 
     return hash;
 }
+
+uint64_t string_hash_fnv1a(char *start) {
+    uint64_t hash = fnv_offset_basis_64;
+
+    for (size_t i = 0; start[i] != '\0'; i++)
+    {
+        hash ^= *(start + i);
+        hash *= fnv_prime_64;
+    }
+
+    return hash;
+}
