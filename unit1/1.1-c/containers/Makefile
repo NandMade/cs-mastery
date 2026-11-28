@@ -27,7 +27,7 @@ test: test_vec test_map
 
 valgrind: test_vec_raw test_map_raw
 	valgrind -q --leak-check=full --error-exitcode=1 ./test_vec_raw
-	valgrind -q --lead-check=full --error-exitcode=1 ./test_map_raw
+	valgrind -q --leak-check=full --error-exitcode=1 ./test_map_raw
 
 test_vec_raw: test_vec_raw.o vec_raw.o int_math_raw.o
 	$(CC) $(CFLAGS) -o $@ $^

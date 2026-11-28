@@ -84,7 +84,8 @@ Map *build_large_map(void) {
     {
         char key[9];
         snprintf(key, 9, "key%i", i);
-        CHECK(map_put(m, key, i), "Failed to put value in Map.\n");
+        bool success = map_put(m, key, i);
+        CHECK(success, "Failed to put value in Map.\n");
     }
 
     return m;
@@ -100,7 +101,8 @@ void test_map_put_100000Entries_growsCorrectly(void) {
         char key[9];
         int out;
         snprintf(key, 9, "key%i", i);
-        CHECK(map_get(m, key, &out), "Failed to get value from Map.\n");   
+        bool success = map_get(m, key, &out);
+        CHECK(success, "Failed to get value from Map\n");   
         CHECK(out == i, "The value does not match what was put in for the key.\n");
     }
 

@@ -1,0 +1,128 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-std=c17",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-g",
+      "-I",
+      "/home/nandgrenade/learning/lib",
+      "-fsanitize=address,undefined",
+      "-fno-sanitize-recover=all",
+      "-c",
+      "-o",
+      "test_vec.o",
+      "test_vec.c"
+    ],
+    "directory": "/home/nandgrenade/learning/unit1/1.1-c/containers",
+    "file": "/home/nandgrenade/learning/unit1/1.1-c/containers/test_vec.c",
+    "output": "/home/nandgrenade/learning/unit1/1.1-c/containers/test_vec.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-std=c17",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-g",
+      "-I",
+      "/home/nandgrenade/learning/lib",
+      "-fsanitize=address,undefined",
+      "-fno-sanitize-recover=all",
+      "-c",
+      "-o",
+      "vec.o",
+      "vec.c"
+    ],
+    "directory": "/home/nandgrenade/learning/unit1/1.1-c/containers",
+    "file": "/home/nandgrenade/learning/unit1/1.1-c/containers/vec.c",
+    "output": "/home/nandgrenade/learning/unit1/1.1-c/containers/vec.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-std=c17",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-g",
+      "-I",
+      "/home/nandgrenade/learning/lib",
+      "-fsanitize=address,undefined",
+      "-fno-sanitize-recover=all",
+      "-c",
+      "-o",
+      "int_math.o",
+      "/home/nandgrenade/learning/lib/int_math.c"
+    ],
+    "directory": "/home/nandgrenade/learning/unit1/1.1-c/containers",
+    "file": "/home/nandgrenade/learning/lib/int_math.c",
+    "output": "/home/nandgrenade/learning/unit1/1.1-c/containers/int_math.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-std=c17",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-g",
+      "-I",
+      "/home/nandgrenade/learning/lib",
+      "-fsanitize=address,undefined",
+      "-fno-sanitize-recover=all",
+      "-c",
+      "-o",
+      "test_map.o",
+      "test_map.c"
+    ],
+    "directory": "/home/nandgrenade/learning/unit1/1.1-c/containers",
+    "file": "/home/nandgrenade/learning/unit1/1.1-c/containers/test_map.c",
+    "output": "/home/nandgrenade/learning/unit1/1.1-c/containers/test_map.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-std=c17",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-g",
+      "-I",
+      "/home/nandgrenade/learning/lib",
+      "-fsanitize=address,undefined",
+      "-fno-sanitize-recover=all",
+      "-c",
+      "-o",
+      "map.o",
+      "map.c"
+    ],
+    "directory": "/home/nandgrenade/learning/unit1/1.1-c/containers",
+    "file": "/home/nandgrenade/learning/unit1/1.1-c/containers/map.c",
+    "output": "/home/nandgrenade/learning/unit1/1.1-c/containers/map.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/gcc",
+      "-std=c17",
+      "-Wall",
+      "-Wextra",
+      "-Wpedantic",
+      "-g",
+      "-I",
+      "/home/nandgrenade/learning/lib",
+      "-fsanitize=address,undefined",
+      "-fno-sanitize-recover=all",
+      "-c",
+      "-o",
+      "hash.o",
+      "/home/nandgrenade/learning/lib/hash.c"
+    ],
+    "directory": "/home/nandgrenade/learning/unit1/1.1-c/containers",
+    "file": "/home/nandgrenade/learning/lib/hash.c",
+    "output": "/home/nandgrenade/learning/unit1/1.1-c/containers/hash.o"
+  }
+]

@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-uint64_t hash_fnv1a(byte *start, size_t length);
-uint64_t string_hash_fnv1a(char *start);
+uint64_t hash_fnva1(byte *start, size_t length);
+uint64_t string_hash_fnva1(const char *start);
 
 #endif

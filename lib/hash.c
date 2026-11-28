@@ -3,7 +3,7 @@
 static const uint64_t fnv_offset_basis_64 = 0xcbf29ce484222325;
 static const uint64_t fnv_prime_64 = 0x100000001b3;
 
-uint64_t hash_fnv1a(byte *start, size_t length) {
+uint64_t hash_fnva1(byte *start, size_t length) {
     uint64_t hash = fnv_offset_basis_64;
 
     for (size_t i = 0; i < length; i++) 
@@ -15,7 +15,7 @@ uint64_t hash_fnv1a(byte *start, size_t length) {
     return hash;
 }
 
-uint64_t string_hash_fnv1a(char *start) {
+uint64_t string_hash_fnva1(const char *start) {
     uint64_t hash = fnv_offset_basis_64;
 
     for (size_t i = 0; start[i] != '\0'; i++)
