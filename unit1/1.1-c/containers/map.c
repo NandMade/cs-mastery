@@ -50,7 +50,7 @@ void map_destroy(Map *m) {
     {
         MapEntry *entry = m->entries + i;
 
-        if (entry->key != NULL && strcmp(entry->key, TOMBSTONE_KEY))
+        if (entry->key != NULL && entry->key != TOMBSTONE_KEY)
         {
             free(entry->key);
         }
@@ -69,27 +69,26 @@ static bool slot_put(Map *m, Slot *slots, size_t capacity, MapEntry *entry)
         int hash = string_hash_fnva1(entry->key);
         size_t slot_index = hash & (capacity - 1);
         MapEntry *slot = slots[slot_index];
-        unsigned int first_avaialable = SLOT_SIZE;
-        bool dead = false;
-
-        for (unsigned int s = 0; s < SLOT_SIZE; s++)
+        size_t end = capacity * SLOT_SIZE;
+        size_t first_tombstone = SIZE_MAX;
+        
+        for (size_t s = 0; s < end; s++)
         {
             if (slot[s].key == NULL)
             {
-                if (first_avaialable == SLOT_SIZE)
+                slot[s] = *entry;
+
+                if (m->slots == slots)
                 {
-                    first_avaialable = s;
-                    continue;
+                    m->length++;
                 }
+
+                return true;
             }
-            else if (slot[s].key == TOMBSTONE_KEY)
+
+            if (slot[s].key == TOMBSTONE_KEY)
             {
-                if (first_avaialable == SLOT_SIZE)
-                {
-                    first_avaialable = s;
-                    dead = true;
-                    continue;
-                }
+                if (first_tombstone == SIZE_MAX) first_tombstone = s;
             }
             else if (!strcmp(slot[s].key, entry->key))
             {
@@ -104,20 +103,16 @@ static bool slot_put(Map *m, Slot *slots, size_t capacity, MapEntry *entry)
             }
         }
 
-        if (first_avaialable != SLOT_SIZE)
+        if (first_tombstone != SLOT_SIZE)
         {
-            slot[first_avaialable] = *entry;
-
-            if (dead) 
-            {
-                m->dead--;
-            }
-
+            slot[first_tombstone] = *entry;
+            
             if (m->slots == slots)
             {
                 m->length++;
+                m->dead--;
             }
-
+            
             return true;
         }
 
@@ -136,7 +131,8 @@ static bool map_grow(Map *m) {
     {
         MapEntry *entry = m->entries + e;
 
-        if (entry->key == NULL) continue;
+        if (entry->key == NULL || entry->key == TOMBSTONE_KEY) continue;
+
         if (!slot_put(m, new_slots, new_capacity, entry))
         {
             free(new_slots);
@@ -163,6 +159,9 @@ bool map_put(Map *m, const char *key, int value) {
 
     size_t length = strlen(key);
     char *key_copy = malloc(length + 1);
+
+    if (key_copy == NULL) return false;
+
     memcpy(key_copy, key, length + 1);
     
     if (!slot_put(m, m->slots, m->capacity, &(MapEntry){ .key = key_copy, .value = value })) 
@@ -180,11 +179,11 @@ static bool map_get_index(const Map *m, const char *key, size_t *index) {
     size_t slot_index = hash & (m->capacity - 1);
     MapEntry *slot = m->slots[slot_index];
 
-    for (unsigned int i = 0; i < SLOT_SIZE; i++)
+    for (size_t i = 0; i < m->capacity * SLOT_SIZE; i++)
     {
-        MapEntry entry = slot[i];
+        MapEntry *entry = slot + i;
         
-        if (entry.key != NULL && !strcmp(entry.key, key))
+        if (entry->key != NULL && entry->key != TOMBSTONE_KEY && !strcmp(entry->key, key))
         {
             *index = slot_index * SLOT_SIZE + i;
 
