@@ -183,7 +183,12 @@ static bool map_get_index(const Map *m, const char *key, size_t *index) {
     {
         MapEntry *entry = slot + i;
         
-        if (entry->key != NULL && entry->key != TOMBSTONE_KEY && !strcmp(entry->key, key))
+        if (entry->key == NULL)
+        {
+            return false;
+        }
+
+        if (entry->key != TOMBSTONE_KEY && !strcmp(entry->key, key))
         {
             *index = slot_index * SLOT_SIZE + i;
 
