@@ -32,11 +32,24 @@ Weak spots, questions to revisit, and topics to re-quiz.
 
 **Part B (done 2026-11-24):** `make test` passes under gcc and clang with the full sanitizer flags. Extra edge cases also pass: exact fill, the allocation after a full arena, `SIZE_MAX` and `SIZE_MAX - 1` on a partly full arena, just-over vs exactly-remaining, reset returning the buffer start, and align 0, 3, 12, `SIZE_MAX` and an align larger than the arena. Style points (`static` helpers, the two redundant capacity checks, the `SIZE_MAX`-align test asserting `NULL`) fixed in 6c62013. Stretch (chain blocks) not attempted; offer it again if the dynamic array goes quickly.
 
+**Session 2 containers review, 2026-11-28 (at fc7ff91):** `make test` passes under gcc and clang and `make valgrind` is clean, but the map has bugs the tests don't reach. (A 2026-11-25 Part A review and the lesson's 1.5 → 1.4 threshold fix were committed to the old Windows copy and lost in the move to GitHub; re-applied here.)
+- **vec: passes** except one test gap. All five 2026-11-25 blockers are fixed (linking, inverted checks, capacity updated before `realloc`, `main` returning failures, `elem_size` 0). Remaining: the growth test checks only the first step (16 → 24); the done-when asks it to record every capacity change over 1,000,000 pushes. The code satisfies it (×1.5 from 16 never drops below ×1.49).
+- **map: not passed.** Probe (scratch, not in the repo) results:
+  1. `map_len` never goes down: `map_remove` bumps `dead` but not `length`, and reusing a tombstone doesn't count the new key. Put + remove gives len 1; 200k put/remove churn gives len 175136.
+  2. Duplicate keys: `slot_put` takes the first tombstone before checking the rest of the bucket for the same key. Put a, put k (same bucket), remove a, put k → two `k`s, len 2; after removing k it is still found. The done-when's "then insert new keys" step is missing from the tests and would catch it.
+  3. The tombstone is a real `""` string, compared with `strcmp`: `map_get("")` finds a removed entry (returned a stale value 7), `map_remove("")` frees the static tombstone (ASan: bad free), and `map_destroy` leaks a real `""` key. Pointer comparison is the fix region (`map_destroy`, `map_get_index`).
+  4. `map_grow` re-inserts tombstones (skips only NULL), then sets `dead = 0`, so dead slots survive every grow and `dead` underflows when one is reused.
+  5. A full 8-entry bucket makes `map_put` fail for good: no grow-and-retry or probe of the next bucket.
+  6. `map_put` doesn't check `malloc`; `map_create` leaks the `Map` when `calloc` fails.
+  - Nits: `int hash` in `slot_put` vs `uint64_t` in `map_get_index`; unused `#include "../arena/arena.h"`; clang `-Wnewline-eof` in `lib/`; `test_vec.o`, `test_vec.d` and `compile_commands.json` are still tracked in git (needs `git rm --cached`).
+- **Copy vs original, third time:** `MapEntry entry = m->entries[index]` in `map_remove` changed a copy (after `vec_pop`'s `out =` and the `Slot` initializer). Fixed now, but quiz struct copies vs pointers to slots in session 3.
+- Out-parameters were weak on 2026-11-25 (thought you can't write through one into caller storage; `realloc` already copies). Re-quiz.
+
 **Background gap:** comfortable with C itself but has no experience with real-world C build systems or automated testing. Taught a Makefile + hand-rolled CHECK-macro tests in the 1.1 supplement (2026-11-19); review the arena's Makefile and tests as closely as its code. Introduce pattern rules and `-MMD -MP` when a practicum grows past a few files, and CMake properly in Bridge B.
 
 **Bit-trick intuition (raised 2026-11-24):** the learner is worried they can't intuit binary tricks (e.g. exponentiation by squaring). Reassured: the tricks are learned folklore built from a few primitives (`x & (x-1)`, `x & -x`, mask = mod by a power of two, `-x = ~x + 1`). In 1.2, have them work 4- or 8-bit examples by hand and derive each trick from those primitives before seeing a solution, and point out when they've derived one themselves.
 
-**Environment:** Debian on WSL2, gcc 14.2 and clang 19.1. Learner codes in `~/learning` there and pushes to the Windows copy (see CLAUDE.md). `pull.rebase=true` set in the Debian repo.
+**Environment:** Debian on WSL2, gcc 14.2 and clang 19.1. Learner codes in `~/learning` there; `origin` is GitHub since 2026-11-28 (see CLAUDE.md). `pull.rebase=true` set in the Debian repo.
 
 ## Modules
 
@@ -102,3 +115,4 @@ Weak spots, questions to revisit, and topics to re-quiz.
 | 2026-11-19 | 1.1 | Supplement for Part B: what an arena is, alignment as a property of the type (`alignof`), Make basics, hand-rolled C tests, `-fno-sanitize-recover=all` (added to the done-when flags) | Read the supplement, then build the arena with `make test` |
 | 2026-11-24 | 1.1 | Reviewed the Part B arena twice. First pass found off-by-one padding (exact fit returned NULL), no power-of-two check (align 0 divided by zero), unchecked `malloc`, and tests that passed on NULL. All fixed; Part B passes its done-when list under gcc and clang | Re-quiz, then 1.1 session 2: dynamic array and hash map |
 | 2026-11-24 | 1.1 | Session 2 "Growing Things". Quiz: `.rodata` vs stack array right; hex notation was new (thought `0x` was binary); padding by hand right, wrote the branch-free expression; signed-overflow folding right, slipped tracing `UINT_MAX + 1 > UINT_MAX`; sanitizer-recover and warning vs error right. Taught dynamic arrays, `realloc` traps, open addressing, deletion, pattern rules with `-MMD -MP`, valgrind vs ASan, gdb basics. Added `*.d` to `.gitignore` | Build `unit1/1.1-c/containers/` (vec, then map) with `make test` and `make valgrind`; bring it to session 3 |
+| 2026-11-28 | 1.1 | Reviewed both containers (see running notes). vec passes apart from the full growth test; map not passed: `map_len` ignores removes, duplicate keys via tombstone reuse, `""` key collides with the tombstone, tombstones survive grow, full bucket fails the put. Repo moved to GitHub; restored lost tutor changes | Fix the map, add the growth and re-insert tests, bring back for a re-review |
