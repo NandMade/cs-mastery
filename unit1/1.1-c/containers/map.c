@@ -69,26 +69,27 @@ static bool slot_put(Map *m, Slot *slots, size_t capacity, MapEntry *entry)
         int hash = string_hash_fnva1(entry->key);
         size_t slot_index = hash & (capacity - 1);
         MapEntry *slot = slots[slot_index];
+        unsigned int first_avaialable = SLOT_SIZE;
+        bool dead = false;
 
         for (unsigned int s = 0; s < SLOT_SIZE; s++)
         {
             if (slot[s].key == NULL)
             {
-                slot[s] = *entry;
-
-                if (m->slots == slots)
+                if (first_avaialable == SLOT_SIZE)
                 {
-                    m->length++;
+                    first_avaialable = s;
+                    continue;
                 }
-                
-                return true;
             }
             else if (slot[s].key == TOMBSTONE_KEY)
             {
-                slot[s] = *entry;
-                m->dead--;      
-                
-                return true;
+                if (first_avaialable == SLOT_SIZE)
+                {
+                    first_avaialable = s;
+                    dead = true;
+                    continue;
+                }
             }
             else if (!strcmp(slot[s].key, entry->key))
             {
@@ -96,11 +97,28 @@ static bool slot_put(Map *m, Slot *slots, size_t capacity, MapEntry *entry)
                 {
                     free(entry->key);
                 }
-                
+
                 slot[s].value = entry->value;
                 
                 return true;
             }
+        }
+
+        if (first_avaialable != SLOT_SIZE)
+        {
+            slot[first_avaialable] = *entry;
+
+            if (dead) 
+            {
+                m->dead--;
+            }
+
+            if (m->slots == slots)
+            {
+                m->length++;
+            }
+
+            return true;
         }
 
         return false;
@@ -196,6 +214,7 @@ bool map_remove(Map *m, const char *key) {
     free(entry->key);
     entry->key = TOMBSTONE_KEY;
     m->dead++;
+    m->length--;
 
     return true;
 }
